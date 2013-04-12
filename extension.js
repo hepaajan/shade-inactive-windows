@@ -59,7 +59,7 @@ function enable() {
 
     function window_created(__unused_display, the_window) {
         if (the_window) {
-            the_window._dim_on_focus = the_window.connect('focus', focus);
+            the_window._shade_on_focus = the_window.connect('focus', focus);
         }
     }
     on_window_created = global.display.connect('window-created', window_created);
@@ -92,9 +92,9 @@ function disable() {
     }
     global.get_window_actors().forEach(function(wa) {
         var win = wa.get_meta_window();
-        if (win && win._dim_on_focus) {
-            win.disconnect(win._dim_on_focus);
-            delete win._dim_on_focus;
+        if (win && win._shade_on_focus) {
+            win.disconnect(win._shade_on_focus);
+            delete win._shade_on_focus;
         }
         if(wa._inactive_shader) {
             wa._inactive_shader.shadeLevel = 0.0;
