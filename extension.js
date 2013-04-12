@@ -37,8 +37,28 @@ function init() {
 
 function enable() {
 
+    function verifyShader(wa) {
+        if (wa._inactive_shader)
+            return;
+        var meta_win = wa.get_meta_window();
+        if (!meta_win) {
+            return;
+        }
+        wa._inactive_shader = new WindowShader(wa);
+        if(!wa._inactive_shader)
+            return;
+        if (!meta_win.has_focus()) {
+            Tweener.addTween(wa._inactive_shader,
+                             { shadeLevel: 1.0,
+                               time: SHADE_TIME,
+                               transition: 'linear'
+                             });
+        }
+    }
+
     function focus(the_window) {
         global.get_window_actors().forEach(function(wa) {
+            verifyShader(wa);
             if (!wa._inactive_shader)
                 return;
             if (the_window == wa.get_meta_window()) {
@@ -65,24 +85,12 @@ function enable() {
     on_window_created = global.display.connect('window-created', window_created);
 
     global.get_window_actors().forEach(function(wa) {
-        window_created(null, wa.get_meta_window());
-    });
-
-    global.get_window_actors().forEach(function(wa) {
         var meta_win = wa.get_meta_window();
         if (!meta_win) {
             return;
         }
-        wa._inactive_shader = new WindowShader(wa);
-        if(!wa._inactive_shader)
-            return;
-        if (!meta_win.has_focus()) {
-            Tweener.addTween(wa._inactive_shader,
-                             { shadeLevel: 1.0,
-                               time: SHADE_TIME,
-                               transition: 'linear'
-                             });
-        }
+        verifyShader(wa);
+        window_created(null, wa.get_meta_window());
     });
 }
 
