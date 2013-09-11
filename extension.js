@@ -1,5 +1,6 @@
 /* -*- mode: js2 - indent-tabs-mode: nil - js2-basic-offset: 4 -*- */
 const St = imports.gi.St;
+const Meta = imports.gi.Meta;
 const Lang = imports.lang;
 const Main = imports.ui.main;
 const Tweener = imports.ui.tweener;
@@ -37,11 +38,21 @@ function init() {
 
 function enable() {
 
+    function use_shader(meta_win) {
+	if (!meta_win) {
+	    return false;
+	}
+	var type = meta_win.get_window_type()
+	return (type == Meta.WindowType.NORMAL ||
+		type == Meta.WindowType.DIALOG ||
+		type == Meta.WindowType.MODAL_DIALOG);
+    }
+
     function verifyShader(wa) {
         if (wa._inactive_shader)
             return;
         var meta_win = wa.get_meta_window();
-        if (!meta_win) {
+        if (!use_shader(meta_win)) {
             return;
         }
         wa._inactive_shader = new WindowShader(wa);
@@ -78,7 +89,7 @@ function enable() {
     }
 
     function window_created(__unused_display, the_window) {
-        if (the_window) {
+        if (use_shader(the_window)) {
             the_window._shade_on_focus = the_window.connect('focus', focus);
         }
     }
