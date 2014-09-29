@@ -8,6 +8,7 @@ const Clutter = imports.gi.Clutter;
 
 const SHADE_TIME = 0.3;
 const SHADE_BRIGHTNESS = -0.3;
+const SHADE_DESATURATION = 0.5;
 
 let on_window_created;
 
@@ -15,18 +16,23 @@ const WindowShader = new Lang.Class({
     Name: 'WindowShader',
 
     _init: function(actor) {
-        this._effect = new Clutter.BrightnessContrastEffect();
-        actor.add_effect(this._effect);
+        this._desat_effect = new Clutter.DesaturateEffect({ factor: 0.0 });
+        this._brightness_effect = new Clutter.BrightnessContrastEffect();
+        actor.add_effect(this._desat_effect);
+        actor.add_effect(this._brightness_effect);
         this.actor = actor;
         this._enabled = true;
         this._shadeLevel = 0.0;
-        this._effect.enabled = (this._shadeLevel > 0);
+        this._desat_effect.enabled = (this._shadeLevel > 0);
+        this._brightness_effect.enabled = (this._shadeLevel > 0);
     },
 
     set shadeLevel(level) {
         this._shadeLevel = level;
-        this._effect.set_brightness(level * SHADE_BRIGHTNESS);
-        this._effect.enabled = (this._shadeLevel > 0);
+        this._brightness_effect.set_brightness(level * SHADE_BRIGHTNESS);
+        this._desat_effect.set_factor(level * SHADE_DESATURATION);
+        this._brightness_effect.enabled = (this._shadeLevel > 0);
+        this._desat_effect.enabled = (this._shadeLevel > 0);
     },
 
     get shadeLevel() {
@@ -117,7 +123,8 @@ function disable() {
         }
         if(wa._inactive_shader) {
             wa._inactive_shader.shadeLevel = 0.0;
-            wa.remove_effect(wa._inactive_shader._effect);
+            wa.remove_effect(wa._inactive_shader._desat_effect);
+            wa.remove_effect(wa._inactive_shader._brightness_effect);
             delete wa._inactive_shader;
         }
     });
