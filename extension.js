@@ -5,8 +5,9 @@ const Lang = imports.lang;
 const Main = imports.ui.main;
 const Tweener = imports.ui.tweener;
 const Clutter = imports.gi.Clutter;
+const Gio = imports.gi.Gio;
+const ExtensionUtils = imports.misc.extensionUtils;
 
-const SHADE_TIME = 0.3;
 const SHADE_BRIGHTNESS = -0.3;
 
 let on_window_created;
@@ -33,7 +34,21 @@ const WindowShader = new Lang.Class({
         return this._shadeLevel;
     }
 });
+
+var ShadeInactiveWindowsSettings = {};
 function init() {
+    var schemaDir = ExtensionUtils.getCurrentExtension().dir.get_child('data').get_child('glib-2.0').get_child('schemas');
+    var schemaSource = Gio.SettingsSchemaSource.get_default();
+
+    if(schemaDir.query_exists(null)) {
+        schemaSource = Gio.SettingsSchemaSource.new_from_directory(schemaDir.get_path(), schemaSource, false);
+    }
+
+    var schemaObj = schemaSource.lookup('fi.iki.hepaajan.shade-inactive-windows.preferences', true);
+    if(!schemaObj) {
+        throw new Error('failure to look up schema');
+    }
+    ShadeInactiveWindowsSettings = new Gio.Settings({ settings_schema: schemaObj });
 }
 
 function enable() {
@@ -59,9 +74,10 @@ function enable() {
         if(!wa._inactive_shader)
             return;
         if (!meta_win.has_focus()) {
+            var shade_time = ShadeInactiveWindowsSettings.get_int('shade-time') / 1000;
             Tweener.addTween(wa._inactive_shader,
                              { shadeLevel: 1.0,
-                               time: SHADE_TIME,
+                               time: shade_time,
                                transition: 'linear'
                              });
         }
@@ -72,16 +88,17 @@ function enable() {
             verifyShader(wa);
             if (!wa._inactive_shader)
                 return;
+            var shade_time = ShadeInactiveWindowsSettings.get_int('shade-time') / 1000;
             if (the_window == wa.get_meta_window()) {
                 Tweener.addTween(wa._inactive_shader,
                                  { shadeLevel: 0.0,
-                                   time: SHADE_TIME,
+                                   time: shade_time,
                                    transition: 'linear'
                  });
             } else if(wa._inactive_shader.shadeLevel == 0.0) {
                 Tweener.addTween(wa._inactive_shader,
                                  { shadeLevel: 1.0,
-                                   time: SHADE_TIME,
+                                   time: shade_time,
                                    transition: 'linear'
                                  });
             }

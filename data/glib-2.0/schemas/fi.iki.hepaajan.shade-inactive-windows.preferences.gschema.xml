@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema path="/fi/iki/hepaajan/shade-inactive-windows/preferences/"
+          id="fi.iki.hepaajan.shade-inactive-windows.preferences"
+          gettext-domain="gsettings-desktop-schemas">
+    <key type="i" name="shade-time">
+      <range min="0" max="1000"/>
+      <default>300</default>
+      <summary>Time in milliseconds over which shading occurs</summary>
+      <description>
+        The time over which the shading effect is applied, in milliseconds.
+      </description>
+    </key>
+  </schema>
+</schemalist>
