@@ -6,7 +6,8 @@ const Main = imports.ui.main;
 const Tweener = imports.ui.tweener;
 const Clutter = imports.gi.Clutter;
 
-const SHADE_TIME = 0.3;
+const SHADE_IN_TIME = 0.1;
+const SHADE_OUT_TIME = 2;
 const SHADE_BRIGHTNESS = -0.3;
 
 let on_window_created;
@@ -61,7 +62,7 @@ function enable() {
         if (!meta_win.has_focus()) {
             Tweener.addTween(wa._inactive_shader,
                              { shadeLevel: 1.0,
-                               time: SHADE_TIME,
+                               time: SHADE_OUT_TIME,
                                transition: 'linear'
                              });
         }
@@ -75,13 +76,13 @@ function enable() {
             if (the_window == wa.get_meta_window()) {
                 Tweener.addTween(wa._inactive_shader,
                                  { shadeLevel: 0.0,
-                                   time: SHADE_TIME,
+                                   time: SHADE_IN_TIME,
                                    transition: 'linear'
                  });
-            } else if(wa._inactive_shader.shadeLevel == 0.0) {
+            } else if(wa._inactive_shader.shadeLevel < 1.0) {
                 Tweener.addTween(wa._inactive_shader,
                                  { shadeLevel: 1.0,
-                                   time: SHADE_TIME,
+                                   time: SHADE_OUT_TIME,
                                    transition: 'linear'
                                  });
             }

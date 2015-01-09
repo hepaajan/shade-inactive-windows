@@ -1,5 +1,5 @@
 {
-    "shell-version": ["3.4", "3.6", "3.8", "3.10", "3.12"],
+    "shell-version": ["3.4", "3.6", "3.8", "3.10", "3.12", "3.14"],
     "uuid": "shade-inactive-windows@hepaajan.iki.fi",
     "name": "Shade Inactive Windows",
     "description": "Make inactive windows darker",
